@@ -69,10 +69,18 @@ public class Paging {
         
         // Simulate accessing a large amount of memory randomly
         Random rand = new Random();
+        long startTime = System.currentTimeMillis();
         for (int i = 0; i < 1000000; i++) {
             int address = rand.nextInt(memoryManager.MEMORY_SIZE);
             memoryManager.write(address, i);
             memoryManager.read(address);
         }
+        long endTime = System.currentTimeMillis();
+        long totalTime = endTime - startTime;
+        double efficiency = (double) memoryManager.NUM_PAGES / (double) (totalTime / 1000.0);
+        System.out.println();
+        System.out.println("Time taken: " + totalTime + " ms");
+        System.out.println("Efficiency: " + efficiency + " pages/second");
     }
+    
 }

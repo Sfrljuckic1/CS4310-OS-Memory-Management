@@ -50,14 +50,26 @@ public class Segmentation {
     public static void main(String[] args) {
         Segmentation memoryManager = new Segmentation(1024, 64);
 
+        long startTime = System.nanoTime();
         int address1 = memoryManager.allocate(128);
+        long endTime = System.nanoTime();
         System.out.println("Allocated address 1: " + address1);
+        System.out.println("Time taken to allocate 128 bytes: " + (endTime - startTime) + " ns");
+        System.out.println();
 
+        startTime = System.nanoTime();
         int address2 = memoryManager.allocate(256);
+        endTime = System.nanoTime();
         System.out.println("Allocated address 2: " + address2);
+        System.out.println("Time taken to allocate 256 bytes: " + (endTime - startTime) + " ns");
+        System.out.println();
 
+        startTime = System.nanoTime();
         int address3 = memoryManager.allocate(512);
+        endTime = System.nanoTime();
         System.out.println("Allocated address 3: " + address3);
+        System.out.println("Time taken to allocate 512 bytes: " + (endTime - startTime) + " ns");
+        System.out.println();
 
         boolean isValid1 = memoryManager.isAddressValid(address1);
         boolean isValid2 = memoryManager.isAddressValid(address2);
@@ -65,13 +77,19 @@ public class Segmentation {
         System.out.println("Validity of address 1: " + isValid1);
         System.out.println("Validity of address 2: " + isValid2);
         System.out.println("Validity of address 3: " + isValid3);
+        System.out.println();
 
+        startTime = System.nanoTime();
         memoryManager.free(address2);
+        endTime = System.nanoTime();
+        System.out.println("Time taken to free address 2: " + (endTime - startTime) + " ns");
+        System.out.println();
 
         boolean isValid4 = memoryManager.isAddressValid(address2);
         System.out.println("Validity of address 2 after freeing: " + isValid4);
+        System.out.println();
     }
-
+    
     private class MemorySegment {
         private int id;
         private int size;
