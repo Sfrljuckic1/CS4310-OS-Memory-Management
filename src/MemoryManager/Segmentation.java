@@ -32,8 +32,10 @@ public class Segmentation {
         MemorySegment segment = segmentTable.get(segmentId);
         if (segment != null) {
             segmentTable.remove(segmentId);
+            System.out.println("Freed memory segment with ID: " + segment.getId());
         }
     }
+    
 
     public boolean isAddressValid(int address) {
         int segmentId = address / blockSize;

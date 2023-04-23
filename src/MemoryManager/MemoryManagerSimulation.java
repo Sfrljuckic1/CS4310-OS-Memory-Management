@@ -23,16 +23,25 @@ public class MemoryManagerSimulation {
         start = System.currentTimeMillis();
         // Test allocating memory
         int address1 = segmentation.allocate(128);
+        System.out.println("Allocated address1: " + address1);
         int address2 = segmentation.allocate(256);
+        System.out.println("Allocated address2: " + address2);
         int address3 = segmentation.allocate(512);
+        System.out.println("Allocated address3: " + address3);
         // Test checking address validity
         boolean isValid1 = segmentation.isAddressValid(address1);
         boolean isValid2 = segmentation.isAddressValid(address2);
         boolean isValid3 = segmentation.isAddressValid(address3);
+        System.out.println("isValid1: " + isValid1);
+        System.out.println("isValid2: " + isValid2);
+        System.out.println("isValid3: " + isValid3);
         // Test freeing memory
         segmentation.free(address1);
+        System.out.println("Freed address1: " + address1);
         segmentation.free(address2);
+        System.out.println("Freed address2: " + address2);
         segmentation.free(address3);
+        System.out.println("Freed address3: " + address3);
         end = System.currentTimeMillis();
         long segmentationTime = end - start;
 
