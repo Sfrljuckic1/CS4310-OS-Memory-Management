@@ -6,16 +6,16 @@ public class LRU_Counter
     //helper method to find the page to replace in the event that a fault occurs and the frames are all full
     public static int findPagePositionToReplace(int counter[],int numFrames)
     {
-        int minCount = counter[0];
-        int pos = 0;
-        for(int i=0;i < numFrames;i++) 
+        int minCount = counter[0];  //initialize minimum value
+        int pos = 0;  //initialize position
+        for(int i = 0; i < numFrames; i++) //iterate through the frames
         { 
-            if(minCount > counter[i])
+            if(minCount > counter[i])  //if the minimum count is greater than the current count
             {
-                pos = i;
+                pos = i;  //assign the position the value of that index
             }
         }
-        return pos; 
+        return pos;  //return the position to replace
     }
    
     public static void main(String[] args) 
@@ -70,6 +70,7 @@ public class LRU_Counter
 
                     //set that index of the counter array to hold this frame that is most recently used 
                     //(more recently used page in frame will have a bigger number while least recently used page in frame will have a lower number)
+                    //more recent = higher recency value vs. less recent = lower recency value
                     counter[j] = recent++; 
                     
                     break;  //break out
@@ -86,6 +87,7 @@ public class LRU_Counter
                         
                         //set that index of the counter array to hold this frame that is most recently used 
                         //(more recently used page in frame will have a bigger number while least recently used page in frame will have a lower number)
+                        //more recent = higher recency value vs. less recent = lower recency value
                         counter[j] = recent++; 
                         
                         flag = 1;  //again set the flag
@@ -110,9 +112,9 @@ public class LRU_Counter
         
             //print resulting frames for each iteration
             System.out.println();
-            for(int j=0;j<numFrames;j++)
+            for(int j = 0; j < numFrames; j++)
             {
-                if (frames[j] == -1)
+                if (frames[j] == -1)  //formatting of empty frames
                 {
                     System.out.print("[ ]");
                 }
