@@ -47,6 +47,7 @@ public class MRU {
 
   private int faults = 0;
   private int hits = 0;
+  private double ratio = 0;
 
   public MRU(int[] pointers, int frames) {
     this.frames = frames;
@@ -80,6 +81,7 @@ public class MRU {
   }
 
   public void compute() {
+    long start = System.currentTimeMillis();
     for (Node pointer : pointers) {
 
       // If the current pointer doesn't exist within the queue.
@@ -108,8 +110,14 @@ public class MRU {
       }
 
       System.out.println("-----------------------------------------");
-      System.out.println("Hit: " + this.hits);
       System.out.println("Faults: " + this.faults);
+      System.out.println("Hit: " + this.hits);
+
+      this.ratio = ((double) this.hits / (double) this.pointers.size()) * 100;
+      System.out.println("Hit Ratio: " + this.ratio);
     }
+
+    long delta = System.currentTimeMillis() - start;
+    System.out.println("Completed in (ms): " + delta);
   }
 }
