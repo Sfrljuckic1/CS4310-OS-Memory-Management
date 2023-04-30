@@ -94,15 +94,12 @@ public class MRU {
       // We have add the pointer to the queue and increase the `faults` by 1.
 
       if (!isInMemory(pointer)) {
-        if (this.queue.size() < frames) {
-          this.queue.add(pointer);
-          faults = faults + 1;
-        } else {
-          // The frame is full.
+        if (this.queue.size() >= frames) {
           this.queue.poll();
-          this.queue.add(pointer);
-          this.faults = this.faults + 1;
         }
+
+        this.queue.add(pointer);
+        this.faults = this.faults + 1;
       }
 
       Iterator<Node> iterator = this.queue.iterator();
