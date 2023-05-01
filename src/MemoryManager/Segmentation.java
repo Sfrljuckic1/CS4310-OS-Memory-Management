@@ -1,110 +1,186 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Segmentation {
     private Map<Integer, MemorySegment> segmentTable;
     private int nextSegmentId;
     private int memorySize;
-    private int blockSize;
+    private int pageSize;
+    private int[] pageTable;
+    private int freeFrameCount;
+    private int[] frameTable;
+    private int frameTableSize;
 
-    public Segmentation(int memorySize, int blockSize) {
+    public Segmentation(int memorySize, int pageSize) {
         this.segmentTable = new HashMap<>();
         this.nextSegmentId = 0;
         this.memorySize = memorySize;
-        this.blockSize = blockSize;
+        this.pageSize = pageSize;
+
+        // Initialize page table
+        int numPages = memorySize / pageSize;
+        this.pageTable = new int[numPages];
+        Arrays.fill(pageTable, -1);
+
+        // Initialize frame table
+        this.frameTableSize = memorySize / pageSize;
+        this.frameTable = new int[frameTableSize];
+        Arrays.fill(frameTable, -1);
+        this.freeFrameCount = frameTableSize;
     }
 
     public int allocate(int size) {
-        int numBlocks = (int) Math.ceil((double) size / blockSize);
-        if (numBlocks > memorySize / blockSize) {
+        int numPages = (int) Math.ceil((double) size / pageSize);
+        if (numPages > memorySize / pageSize || numPages > freeFrameCount) {
             // Not enough memory
             return -1;
         }
 
+        // Allocate frames for the new pages
+        int[] pageList = new int[numPages];
+        int i = 0;
+        while (i < numPages) {
+            if (freeFrameCount == 0) {
+                // No free frames left
+                break;
+            }
+
+            int frameIndex = findFreeFrame();
+            if (frameIndex == -1) {
+                // No free frames left
+                break;
+            }
+
+            // Mark frame as used
+            frameTable[frameIndex] = nextSegmentId;
+            freeFrameCount--;
+
+            // Update page table
+            int pageIndex = frameIndex;
+            pageTable[pageIndex] = nextSegmentId;
+            pageList[i] = pageIndex;
+            i++;
+        }
+
+        if (i < numPages) {
+            // Failed to allocate enough frames
+            // Free up the frames we allocated and return -1
+            for (int j = 0; j < i; j++) {
+                int pageIndex = pageList[j];
+                // int segmentId = pageTable[pageIndex];
+                frameTable[pageIndex] = -1;
+                freeFrameCount++;
+            }
+            return -1;
+        }
+
+        // Create new memory segment and update segment table
         int segmentId = nextSegmentId++;
-        MemorySegment segment = new MemorySegment(segmentId, numBlocks);
+        MemorySegment segment = new MemorySegment(segmentId, size, pageList);
         segmentTable.put(segmentId, segment);
-        return segmentId * blockSize;
+
+        return segmentId * pageSize;
     }
 
     public void free(int address) {
-        int segmentId = address / blockSize;
-        MemorySegment segment = segmentTable.get(segmentId);
-        if (segment != null) {
-            segmentTable.remove(segmentId);
-            System.out.println("Freed memory segment with ID: " + segment.getId());
+        int pageIndex = address / pageSize;
+        int segmentId = pageTable[pageIndex];
+        if (segmentId != -1) {
+            MemorySegment segment = segmentTable.get(segmentId);
+            if (segment != null) {
+                // Free all frames used by this segment
+                for (int i = 0; i < segment.getPageCount(); i++) {
+                    int pageTableIndex = segment.getPageList()[i];
+                    frameTable[pageTableIndex] = -1;
+                    freeFrameCount++;
+                }
+
+                // Remove segment from segment table
+                segmentTable.remove(segmentId);
+                System.out.println("Freed memory segment with ID: " + segment.getId());
+            }
         }
     }
-    
 
     public boolean isAddressValid(int address) {
-        int segmentId = address / blockSize;
-        MemorySegment segment = segmentTable.get(segmentId);
-        if (segment != null) {
-            int offset = address % blockSize;
-            return offset < segment.getSize() * blockSize;
+        int pageIndex = address / pageSize;
+        int segmentId = pageTable[pageIndex];
+        if (segmentId != -1) {
+            MemorySegment segment = segmentTable.get(segmentId);
+            // Check if the address is within the bounds of the segment
+            int segmentStart = segmentId * pageSize;
+            int segmentEnd = segmentStart + segment.getSize() - 1;
+            if (address >= segmentStart && address <= segmentEnd) {
+                return true;
+            }
         }
         return false;
     }
-
-    public static void main(String[] args) {
-        Segmentation memoryManager = new Segmentation(1024, 64);
-
-        long startTime = System.nanoTime();
-        int address1 = memoryManager.allocate(128);
-        long endTime = System.nanoTime();
-        System.out.println("Allocated address 1: " + address1);
-        System.out.println("Time taken to allocate 128 bytes: " + (endTime - startTime) + " ns");
-        System.out.println();
-
-        startTime = System.nanoTime();
-        int address2 = memoryManager.allocate(256);
-        endTime = System.nanoTime();
-        System.out.println("Allocated address 2: " + address2);
-        System.out.println("Time taken to allocate 256 bytes: " + (endTime - startTime) + " ns");
-        System.out.println();
-
-        startTime = System.nanoTime();
-        int address3 = memoryManager.allocate(512);
-        endTime = System.nanoTime();
-        System.out.println("Allocated address 3: " + address3);
-        System.out.println("Time taken to allocate 512 bytes: " + (endTime - startTime) + " ns");
-        System.out.println();
-
-        boolean isValid1 = memoryManager.isAddressValid(address1);
-        boolean isValid2 = memoryManager.isAddressValid(address2);
-        boolean isValid3 = memoryManager.isAddressValid(address3);
-        System.out.println("Validity of address 1: " + isValid1);
-        System.out.println("Validity of address 2: " + isValid2);
-        System.out.println("Validity of address 3: " + isValid3);
-        System.out.println();
-
-        startTime = System.nanoTime();
-        memoryManager.free(address2);
-        endTime = System.nanoTime();
-        System.out.println("Time taken to free address 2: " + (endTime - startTime) + " ns");
-        System.out.println();
-
-        boolean isValid4 = memoryManager.isAddressValid(address2);
-        System.out.println("Validity of address 2 after freeing: " + isValid4);
-        System.out.println();
+    
+    
+    
+    private int findFreeFrame() {
+        for (int i = 0; i < frameTableSize; i++) {
+            if (frameTable[i] == -1) {
+                return i;
+            }
+        }
+        return -1;
     }
     
-    private class MemorySegment {
-        private int id;
-        private int size;
+    public static void main(String[] args) {
+        Segmentation segmentation = new Segmentation(1024, 32);
+    
+        int segmentId1 = segmentation.allocate(256);
+        System.out.println("Allocated memory segment with ID: " + segmentId1);
+        int segmentId2 = segmentation.allocate(128);
+        System.out.println("Allocated memory segment with ID: " + segmentId2);
+        int segmentId3 = segmentation.allocate(512);
+        System.out.println("Allocated memory segment with ID: " + segmentId3);
+    
+        System.out.println("Is address 0 valid? " + segmentation.isAddressValid(0));
+        System.out.println("Is address 256 valid? " + segmentation.isAddressValid(256));
+        System.out.println("Is address 512 valid? " + segmentation.isAddressValid(512));
+        System.out.println("Is address 768 valid? " + segmentation.isAddressValid(768));
+        System.out.println("Is address 1023 valid? " + segmentation.isAddressValid(1023));
+    
+        segmentation.free(segmentId1 * 32);
+        System.out.println("Freed memory segment with ID: " + segmentId1);
+    
+        int segmentId4 = segmentation.allocate(256);
+        System.out.println("Allocated memory segment with ID: " + segmentId4);
+    }
+}
 
-        public MemorySegment(int id, int size) {
-            this.id = id;
-            this.size = size;
-        }
+// A class to represent a single memory segment
+class MemorySegment {
+    private int id;             // The ID of the memory segment
+    private int size;           // The total size of the memory segment in bytes
+    private int[] pageList;     // An array of page numbers that belong to this memory segment
 
-        public int getId() {
-            return id;
-        }
+    // Constructor that takes an ID, size, and page list as arguments
+    public MemorySegment(int id, int size, int[] pageList) {
+        this.id = id;
+        this.size = size;
+        this.pageList = pageList;
+    }
 
-        public int getSize() {
-            return size;
-        }
+    // ID of the memory segment
+    public int getId() {
+        return id;
+    }
+
+    // size of the memory segment
+    public int getSize() {
+        return size;
+    }
+
+    // page list of the memory segment
+    public int[] getPageList() {
+        return pageList;
+    }
+
+    // number of pages in the memory segment
+    public int getPageCount() {
+        return pageList.length;
     }
 }
