@@ -30,16 +30,16 @@ class NodeComparator implements Comparator<Node> {
     if (a.frequency < b.frequency) {
       return 1;
     } else if (a.frequency > b.frequency) {
-      return - 1;
+      return -1;
     }
     
     return 0;
   }
 }
 
-// Most Recently Used
-// The most recently used will be discared from the queue.
-public class MRU {
+// Most Frequently Used
+// The most frequently used will be discared from the queue.
+public class MFU {
 
   private int frames;
   private ArrayList<Node> pointers;
@@ -47,8 +47,9 @@ public class MRU {
 
   private int faults = 0;
   private int hits = 0;
+  private double ratio = 0;
 
-  public MRU(int[] pointers, int frames) {
+  public MFU(int[] pointers, int frames) {
     this.frames = frames;
     this.pointers = new ArrayList<>();
     this.queue = new PriorityQueue<>(new NodeComparator());
@@ -80,6 +81,7 @@ public class MRU {
   }
 
   public void compute() {
+    long start = System.currentTimeMillis();
     for (Node pointer : pointers) {
 
       // If the current pointer doesn't exist within the queue.
@@ -108,8 +110,14 @@ public class MRU {
       }
 
       System.out.println("-----------------------------------------");
-      System.out.println("Hit: " + this.hits);
       System.out.println("Faults: " + this.faults);
+      System.out.println("Hit: " + this.hits);
+
+      this.ratio = ((double) this.hits / (double) this.pointers.size()) * 100;
+      System.out.println("Hit Ratio: " + this.ratio);
     }
+
+    long delta = System.currentTimeMillis() - start;
+    System.out.println("Completed in (ms): " + delta);
   }
 }

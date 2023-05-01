@@ -5,9 +5,10 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class FIFO {
-    // Method to find page faults using FIFO
-    static int pageFaults(int pages[], int n, int capacity)
+    //Method to calculate page faults, hits, hit rate, and time elapsed using FIFO algorithm
+    static void pagingFIFO(int pages[], int n, int capacity)
     {
+        long start = System.nanoTime();
         // To represent set of current pages. We use
         // an unordered_set so that we quickly check
         // if a page is present in set or not
@@ -20,16 +21,15 @@ public class FIFO {
         int page_faults = 0;
         for (int i=0; i<n; i++)
         {
-            // Check if the set can hold more pages
+            // Check if the set is full
             if (s.size() < capacity)
             {
-                // Insert it into set if not present
-                // already which represents page fault
+                // If current page is not in set, insert it
                 if (!s.contains(pages[i]))
                 {
                     s.add(pages[i]);
     
-                    // increment page fault
+                    // Increment page fault
                     page_faults++;
       
                     // Push the current page into the queue
@@ -37,28 +37,26 @@ public class FIFO {
                 }
             }
       
-            // If the set is full then need to perform FIFO
-            // i.e. remove the first page of the queue from
-            // set and queue both and insert the current page
+            // If set is filled, perform FIFO
+            // rRemove the first page of the queue from the set and queue, and insert the current page
             else
             {
-                // Check if current page is not already
-                // present in the set
+                // Check if current page is not in set
                 if (!s.contains(pages[i]))
                 {
                     //Pop the first page from the queue
                     int val = indexes.peek();
     
+                    //Remove the head of the queue
                     indexes.poll();
       
-                    //Remove the indexes page
+                    //Remove the indexes page in set
                     s.remove(val);
     
-                    //insert the current page
+                    //Insert the current page
                     s.add(pages[i]);
       
-                    //push the current page into
-                    //the queue
+                    //Push the current page into the queue
                     indexes.add(pages[i]);
       
                     //Increment page faults
@@ -66,8 +64,20 @@ public class FIFO {
                 }
             }
         }
-      
-        return page_faults;
+        //Calculate elapsed time for algorithm
+        long elapsed = System.nanoTime() - start;
+        double elapsedTime = (double)elapsed/1000000;
+
+        //Calculate the number of hits
+        int numHits = pages.length - page_faults;
+
+        //Calculate hit rate
+        double hitRate = 100*(double)numHits/pages.length;
+
+        System.out.println("Time elapsed: " + elapsedTime + "ms");
+        System.out.println("Number of hits: " + numHits);
+        System.out.println("Number of faults: " + page_faults);
+        System.out.println("Hit rate: " + hitRate + "%");
     }
 
     public static void main(String args[])
@@ -77,10 +87,10 @@ public class FIFO {
         System.out.println("FIFO Page Replacement Algorithm Simulation");
         System.out.println("------------------------------------------------------------------------------------------");
         
-        System.out.println("Enter number of frames: ");
+        System.out.print("Enter number of frames: ");
         int capacity = input.nextInt();
 
-        System.out.println("Enter reference string: ");
+        System.out.print("Enter reference string: ");
         int refStringList[];
         String refString = input.next();
         int refStringLength = refString.length();
@@ -90,8 +100,6 @@ public class FIFO {
         {
             refStringList[i] = Integer.parseInt(String.valueOf(refString.charAt(i)));
         }
-
-        System.out.print("Page faults: ");
-        System.out.println(pageFaults(refStringList, refStringList.length, capacity));
+        pagingFIFO(refStringList, refStringList.length, capacity);
     }
 }

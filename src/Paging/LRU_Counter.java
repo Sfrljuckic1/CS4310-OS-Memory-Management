@@ -25,7 +25,6 @@ public class LRU_Counter
         //declare initial variables to track
         int recent = 0, numFaults = 0, numHits = 0;
 
-
         System.out.println("LRU Page Replacement Algorithm Simulation Using Counter");
         System.out.println("------------------------------------------------------------------------------------------");
 

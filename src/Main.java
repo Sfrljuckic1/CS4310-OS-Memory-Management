@@ -1,4 +1,4 @@
-import Paging.MRU;
+import Paging.MFU;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +20,7 @@ public class Main {
         pointers[i] = Integer.parseInt(token);
       }
 
-      MRU mru = new MRU(pointers, 3);
+      MFU mru = new MFU(pointers, 3);
       mru.compute();
 
       buffer.close();
