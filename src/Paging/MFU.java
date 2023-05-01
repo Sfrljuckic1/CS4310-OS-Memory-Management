@@ -37,9 +37,9 @@ class NodeComparator implements Comparator<Node> {
   }
 }
 
-// Most Recently Used
-// The most recently used will be discared from the queue.
-public class MRU {
+// Most Frequently Used
+// The most frequently used will be discared from the queue.
+public class MFU {
 
   private int frames;
   private ArrayList<Node> pointers;
@@ -49,7 +49,7 @@ public class MRU {
   private int hits = 0;
   private double ratio = 0;
 
-  public MRU(int[] pointers, int frames) {
+  public MFU(int[] pointers, int frames) {
     this.frames = frames;
     this.pointers = new ArrayList<>();
     this.queue = new PriorityQueue<>(new NodeComparator());
