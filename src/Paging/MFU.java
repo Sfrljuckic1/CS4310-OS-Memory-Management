@@ -45,7 +45,7 @@ public class MFU {
   private ArrayList<Node> pointers;
   private PriorityQueue<Node> queue;
 
-  private int faults = 0;
+  private int faults = 1;
   private int hits = 0;
   private double ratio = 0;
 
@@ -114,7 +114,7 @@ public class MFU {
       System.out.println("Hit: " + this.hits);
 
       this.ratio = ((double) this.hits / (double) this.pointers.size()) * 100;
-      System.out.println("Hit Ratio: " + this.ratio);
+      System.out.println("Hit Ratio: " + String.format("%.2f", this.ratio) + "%");
     }
 
     long delta = System.currentTimeMillis() - start;

@@ -20,7 +20,7 @@ public class Main {
         pointers[i] = Integer.parseInt(token);
       }
 
-      MFU mru = new MFU(pointers, 3);
+      MFU mru = new MFU(pointers, 4);
       mru.compute();
 
       buffer.close();
