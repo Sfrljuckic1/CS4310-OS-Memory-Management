@@ -1,4 +1,3 @@
-package Paging;
 import java.util.Scanner;
 
 public class LRU_Counter 

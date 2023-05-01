@@ -63,6 +63,9 @@ public class MFU {
   private boolean isInMemory(Node pointer) {
     int target = pointer.value;
     Iterator<Node> iterator = queue.iterator();
+
+    // O(n), where n is the size of the frames.
+    // Therefore, n is a constant, thus O(1)
     while (iterator.hasNext()) {
       Node current = iterator.next();
       if (current.value == target) {
@@ -80,9 +83,14 @@ public class MFU {
     return false;
   }
 
+  // Time complexity: O(n * v) -> O(n); since v is a constant.
+  // Define `n` as the length of the reference string.
+  // Define `v` as the size of the frames.
   public void compute() {
     long start = System.currentTimeMillis();
-    for (Node pointer : pointers) {
+
+    // O(n), where n is the length of pointers.
+    for (Node pointer : pointers) { 
 
       // If the current pointer doesn't exist within the queue.
       // and if the queue size is >= frames
