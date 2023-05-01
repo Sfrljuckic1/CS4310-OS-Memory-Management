@@ -2,26 +2,7 @@ import java.util.StringTokenizer;
 
 
 public class FIFO {
-    /**
-	 * First In First Out page replacement algorithm
-	 * 
-	 * This algorithm swaps pages based on the order in which they were added to the frames,
-	 * it basically has a pointer that points to the next spot after an element was added,
-	 * acting basically like a circular queue. 
-	 * 
-	 * @param reference_string			Reference string, is used to put values into the frames
-	 * @param frames					Integer containing the number of frames (user defined)
-	 * @return							Returns faults, which is the integer containing the number of page faults
-	 * 
-	 * Local Variables:
-	 * faults		int				Contains number of page faults
-	 * array		int[]			Array of frames where values will be added
-	 * i			int				Loop iteration variable
-	 * pointer		int				Pointer to index where value will be input in array
-	 * tok			StringTokenizer	Tokenizer that separates reference string element by element
-	 * value		int				Element in the reference string to be added to array
-	 */
-	
+	//First In First Out page replacement algorithm
 	public static void fifo(String reference_string, int frames) {
 		int faults = 0;
 
@@ -31,19 +12,36 @@ public class FIFO {
 			array[i] = -1;							//are first initialized with 0 and that alters
 		}											//the result
 
+        //single pointer 
 		int pointer = 0;
+        //count string length
         int counter = 0;
+
 		StringTokenizer tok = new StringTokenizer(reference_string);
+        //start time for algorithm
         long start = System.nanoTime();
+
+        //while loop to read reference string
 		while(tok.hasMoreTokens()){
+            //convert string token to int
 			int value = Integer.parseInt(tok.nextToken());
+
+            //increment string counter
             counter++;
+
+            //check if value is already in frame or not
 			if (!(isInFrames(value, frames, array))){
-				faults++;				//increase count of faults
+                //increment page faults
+				faults++;
+
+                //set page value
 				array[pointer] = value;
-				pointer = (pointer+1)%frames;		//move the pointer up in the queue
+
+                //move pointer up in queue
+				pointer = (pointer+1)%frames;
 			}
 		}
+        //end time for algorithm and perform calculations for results
         long elapsed = System.nanoTime() - start;
         double elapsedTime = (double)elapsed/1000000;
         System.out.println("Time elapsed: " + elapsedTime + "ms");
