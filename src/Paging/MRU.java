@@ -30,7 +30,7 @@ class NodeComparator implements Comparator<Node> {
     if (a.frequency < b.frequency) {
       return 1;
     } else if (a.frequency > b.frequency) {
-      return - 1;
+      return -1;
     }
     
     return 0;
